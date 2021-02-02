@@ -1,9 +1,9 @@
-# LibGenesis
+# libgenesis
 
 Asynchronous python library for Libgen.rs to search and download books.
 
 ## Installing libgenesis
-
+using the command line
 ```python
 pip install libgenesis
 ```
@@ -23,8 +23,8 @@ or
 ```python
 lg = Libgen(sort= 'year', sort_mode= 'ASC', result_limit= '50')
 ```
-When creating an instance of LibGen, you can set 3 option.
 
+When creating an instance of LibGen, you can set 3 option.
 - **sort**: You can use this to choose a sorting method from allowed fields ( 'id', 'author', 'title', 'publisher', 'year', 'pages', 'language', 'size', 'extension'). Defaults to 'def'.
 - **sort_mode**: Pick the order of the sort ascending or decending ('ASC', 'DESC'). Defaults to 'DESC'.
 - **result_limit**: Limit the number of results based on the allowed limit (25, 50, 100). Defaults to 25.
@@ -34,12 +34,12 @@ When creating an instance of LibGen, you can set 3 option.
 async def search():
     q = 'japan history'
     result = await lg.search(q)
-
     for item in result:
         print('id = ' + item)
         print('title = ' + result[item]['title'])
         print('md5 = ' + result[item]['md5'])
 ```
+
 The returned data looks like this:
 
 ```python
@@ -112,31 +112,29 @@ The returned data looks like this:
                 'gnutella': 'magnet:?xt=urn:sha1:ZZYRRG56BOX3XAQ5D2IWAV2FUUC35ELG&xl=29750320&dn=a382109f7fdde3be5b2cb4f82d97443b.pdf',
                 'ed2k': 'ed2k://|file|A382109F7FDDE3BE5B2CB4F82D97443B.pdf|29750320|A63EEBB71C46DAE130725C07F2CDC67C|h=733CLKTMCYOGD4W5PIG2GMA7CMLAFN2V|/',
                 'dc++': 'magnet:?xt=urn:tree:tiger:O4O5Z7UL2YAOUG57PINCLOAN63HVZPCSDYACT6Q&xl=29750320&dn=a382109f7fdde3be5b2cb4f82d97443b.pdf'
-            }
-    }
+            },
+    },
     'id_of_book':{
         ...
         ...
         ...
-    }
+    },
     'id_of_book':{
         ...
         ...
         ...
-    }
+    },
 }
 ```
+
 Note that the above information except for mirrors is fecthed as is from Libgen and it is up to the uploader of the books to include the metadata of the books.
 
 ## Downloading a book
-
 Downloading is only supported for the top **3** mirrors in the returned result ('main', 'libgen.lc', 'z-library'). Pass one of the 3 links to the download method of the Libgen object. Optionaly a destination Path can be passed with the url using **dest_folder** argument. The output of the download method is a Path to the downloaded file.
-
 ```python
 async def download():
     q = 'japan history'
     result = await lg.search(q)
-
     download_location = []
     for item in result:
         file_path = await lg.download(result[item]['mirrors']['main'])
