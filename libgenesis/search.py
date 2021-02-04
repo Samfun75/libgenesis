@@ -177,10 +177,17 @@ class Libgen:
 
         ids = 'ids=' + ','.join(ids_list)
         return_fields = 'fields=' + ('id,' if return_fields and 'id' not in return_fields else '') + \
+            ('md5,' if return_fields and 'md5' not in return_fields else '') + \
+            ('sha1,' if return_fields and 'sha1' not in return_fields else '') + \
+            ('filesize,' if return_fields and 'filesize' not in return_fields else '') + \
+            ('edonkey,' if return_fields and 'edonkey' not in return_fields else '') + \
+            ('aich,' if return_fields and 'aich' not in return_fields else '') + \
+            ('tth,' if return_fields and 'tth' not in return_fields else '') + \
+            ('extension,' if return_fields and 'extension' not in return_fields else '') + \
+            ('coverurl,' if return_fields and 'coverurl' not in return_fields else '') + \
             (','.join(return_fields) if return_fields else '*')
 
         url = '&'.join([self.__json_url, ids, return_fields])
-        print(url)
         r = self.__ses.get(url,
                            allow_redirects=True)
         logging.info(
@@ -254,9 +261,10 @@ class Libgen:
 
                     data[res_id]['mirrors'][
                         'dc++'] = f'magnet:?xt=urn:tree:tiger:{tth}&xl={size}&dn={md5}.{extension}'
-
-                    data[res_id].pop('torrent')
-                    data[res_id].pop('locator')
+                    if 'torrent' in data[res_id].keys():
+                        data[res_id].pop('torrent')
+                    if 'locator' in data[res_id].keys():
+                        data[res_id].pop('locator')
                 if removed:
                     for ids in removed:
                         data.pop(ids)
