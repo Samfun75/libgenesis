@@ -1,14 +1,16 @@
-# This workflow will upload a Python Package using Twine when a release is created
+# This workflow will test a Python Package using Twine when a push and pull_request is made to dev branch
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
-name: Upload Python Package
+name: Check Python Package
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
 
 jobs:
-  deploy:
+  test:
 
     runs-on: ubuntu-latest
 
@@ -22,10 +24,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
-    - name: Build and publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+    - name: Build and check
       run: |
         python setup.py sdist bdist_wheel
         twine check dist/*
