@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from libgenesis import Libgen
+import json
 
 
 async def test():
@@ -10,10 +11,10 @@ async def test():
     result = await lg.search('japan history')
 
     ids = [*result]
-    print(result[ids[0]])
+    print(ids[0], json.dumps(result[ids[0]], indent=4))
     # download the first result and print the path
-    file = await lg.download(result[ids[0]]['mirrors']['main'])
-    print(file)
+    # file = await lg.download(result[ids[0]]['mirrors']['main'])
+    # print(file)
 
 
 if __name__ == '__main__':

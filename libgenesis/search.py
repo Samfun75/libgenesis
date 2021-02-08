@@ -158,7 +158,7 @@ class Libgen:
         logging.info(
             f'Requesting IDs page resulted in code: {r.status_code}')
         if r.status_code != 200:
-            await Util().raise_error(r.status_code, r.reason)
+            await Util().raise_error(r.status_code, str(r.reason) + ' - ' + str(bsoup(r.text, 'lxml').get_text()))
 
         soup = bsoup(r.content, 'lxml')
         for s in soup.findAll('script'):
@@ -176,34 +176,43 @@ class Libgen:
                          filters: dict) -> dict:
 
         ids = 'ids=' + ','.join(ids_list)
-        return_fields = 'fields=' + ('id,' if return_fields and 'id' not in return_fields else '') + \
-            ('md5,' if return_fields and 'md5' not in return_fields else '') + \
-            ('sha1,' if return_fields and 'sha1' not in return_fields else '') + \
-            ('filesize,' if return_fields and 'filesize' not in return_fields else '') + \
-            ('edonkey,' if return_fields and 'edonkey' not in return_fields else '') + \
-            ('aich,' if return_fields and 'aich' not in return_fields else '') + \
-            ('tth,' if return_fields and 'tth' not in return_fields else '') + \
-            ('extension,' if return_fields and 'extension' not in return_fields else '') + \
-            ('coverurl,' if return_fields and 'coverurl' not in return_fields else '') + \
-            (','.join(return_fields) if return_fields else '*')
+        if not return_fields or 'mirrors' in return_fields:
+            mirrors = True
+        else:
+            mirrors = False
+        fields = 'fields=' + \
+            ('id,' if return_fields and 'id' not in return_fields else '')
+        if mirrors and '*' not in return_fields:
+            fields += ('md5,' if return_fields and 'md5' not in return_fields else '') + \
+                ('sha1,' if return_fields and 'sha1' not in return_fields else '') + \
+                ('filesize,' if return_fields and 'filesize' not in return_fields else '') + \
+                ('edonkey,' if return_fields and 'edonkey' not in return_fields else '') + \
+                ('aich,' if return_fields and 'aich' not in return_fields else '') + \
+                ('tth,' if return_fields and 'tth' not in return_fields else '') + \
+                ('extension,' if return_fields and 'extension' not in return_fields else '')
 
-        url = '&'.join([self.__json_url, ids, return_fields])
+        fields += (','.join([fld for fld in return_fields if fld !=
+                             'mirrors']) if return_fields else '*')
+
+        url = '&'.join([self.__json_url, ids, fields])
         r = self.__ses.get(url,
                            allow_redirects=True)
         logging.info(
             f'Requesting JSON data from resulted in code: {r.status_code}')
         if r.status_code != 200:
-            await Util().raise_error(r.status_code, r.reason)
+            await Util().raise_error(r.status_code, str(r.reason) + str(bsoup(r.text, 'lxml').get_text()))
 
         raw_data = r.json()
         return await self.__format_json(raw_data=raw_data,
                                         ids_list=ids_list,
-                                        filters=filters)
+                                        filters=filters,
+                                        mirrors=mirrors)
 
     async def __format_json(self,
                             raw_data: list,
                             ids_list: list,
-                            filters: dict) -> dict:
+                            filters: dict,
+                            mirrors: bool) -> dict:
 
         data = {}
         if raw_data:
@@ -217,54 +226,56 @@ class Libgen:
                         if not await Util().filter_result(data[str(res_id)], filters):
                             removed.append(res_id)
                             continue
-                    md5 = data[res_id]['md5']
-                    sha1 = data[res_id]['sha1']
-                    size = data[res_id]['filesize']
-                    edonkey = data[res_id]['edonkey']
-                    aich = data[res_id]['aich']
-                    tth = data[res_id]['tth']
-                    extension = data[res_id]['extension']
-                    tor_number = str(res_id)[
-                        :-3] + '000' if int(res_id) >= 1000 else '000'
 
-                    data[res_id][
-                        'coverurl'] = f'{self.__libgen_url}/covers/{data[res_id]["coverurl"]}'
+                    if 'coverurl' in data[res_id].keys():
+                        data[res_id][
+                            'coverurl'] = f'{self.__libgen_url}/covers/{data[res_id]["coverurl"]}'
+                    if mirrors:
+                        md5 = data[res_id]['md5']
+                        sha1 = data[res_id]['sha1']
+                        size = data[res_id]['filesize']
+                        edonkey = data[res_id]['edonkey']
+                        aich = data[res_id]['aich']
+                        tth = data[res_id]['tth']
+                        extension = data[res_id]['extension']
+                        tor_number = str(res_id)[
+                            :-3] + '000' if int(res_id) >= 1000 else '000'
+                        data[res_id]['mirrors'] = {}
 
-                    data[res_id]['mirrors'] = {}
+                        data[res_id]['mirrors'][
+                            'main'] = f'http://library.lol/main/{md5}'
 
-                    data[res_id]['mirrors'][
-                        'main'] = f'http://library.lol/main/{md5}'
+                        data[res_id]['mirrors'][
+                            'libgen.lc'] = f'http://libgen.lc/ads.php?md5={md5}'
 
-                    data[res_id]['mirrors'][
-                        'libgen.lc'] = f'http://libgen.lc/ads.php?md5={md5}'
+                        data[res_id]['mirrors'][
+                            'z-library'] = f'http://b-ok.cc/md5/{md5}'
 
-                    data[res_id]['mirrors'][
-                        'z-library'] = f'http://b-ok.cc/md5/{md5}'
+                        data[res_id]['mirrors'][
+                            'libgen.pw'] = f'https://libgen.pw/item?id={res_id}'
 
-                    data[res_id]['mirrors'][
-                        'libgen.pw'] = f'https://libgen.pw/item?id={res_id}'
+                        data[res_id]['mirrors'][
+                            'bookfi'] = f'http://bookfi.net/md5/{md5}'
 
-                    data[res_id]['mirrors'][
-                        'bookfi'] = f'http://bookfi.net/md5/{md5}'
+                        data[res_id]['mirrors'][
+                            'torrent'] = f'{self.__libgen_url}/book/index.php?md5={md5}&oftorrent='
 
-                    data[res_id]['mirrors'][
-                        'torrent'] = f'{self.__libgen_url}/book/index.php?md5={md5}&oftorrent='
+                        data[res_id]['mirrors'][
+                            'torrent_1k'] = f'{self.__libgen_url}/repository_torrent/r_{tor_number}.torrent'
 
-                    data[res_id]['mirrors'][
-                        'torrent_1k'] = f'{self.__libgen_url}/repository_torrent/r_{tor_number}.torrent'
+                        data[res_id]['mirrors'][
+                            'gnutella'] = f'magnet:?xt=urn:sha1:{sha1}&xl={size}&dn={md5}.{extension}'
 
-                    data[res_id]['mirrors'][
-                        'gnutella'] = f'magnet:?xt=urn:sha1:{sha1}&xl={size}&dn={md5}.{extension}'
+                        data[res_id]['mirrors'][
+                            'ed2k'] = f'ed2k://|file|{md5.upper()}.{extension}|{size}|{edonkey}|h={aich}|/'
 
-                    data[res_id]['mirrors'][
-                        'ed2k'] = f'ed2k://|file|{md5.upper()}.{extension}|{size}|{edonkey}|h={aich}|/'
-
-                    data[res_id]['mirrors'][
-                        'dc++'] = f'magnet:?xt=urn:tree:tiger:{tth}&xl={size}&dn={md5}.{extension}'
+                        data[res_id]['mirrors'][
+                            'dc++'] = f'magnet:?xt=urn:tree:tiger:{tth}&xl={size}&dn={md5}.{extension}'
                     if 'torrent' in data[res_id].keys():
                         data[res_id].pop('torrent')
                     if 'locator' in data[res_id].keys():
                         data[res_id].pop('locator')
+                    data[res_id].pop('id')
                 if removed:
                     for ids in removed:
                         data.pop(ids)

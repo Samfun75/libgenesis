@@ -3,17 +3,21 @@
 Asynchronous python library for Libgen.rs to search and download books.
 
 ## Installing libgenesis
+
 using the command line
+
 ```python
 pip install libgenesis
 ```
 
 ## Importing libgenesis
+
 ```python
 from libgenesis import Libgen
 ```
 
 ## Creating libgenesis object
+
 ```python
 lg = Libgen()
 ```
@@ -25,11 +29,14 @@ lg = Libgen(sort= 'year', sort_mode= 'ASC', result_limit= '50')
 ```
 
 When creating an instance of LibGen, you can set 3 option.
+
 - **sort**: You can use this to choose a sorting method from allowed fields ( 'id', 'author', 'title', 'publisher', 'year', 'pages', 'language', 'size', 'extension'). Defaults to 'def'.
+
 - **sort_mode**: Pick the order of the sort ascending or decending ('ASC', 'DESC'). Defaults to 'DESC'.
 - **result_limit**: Limit the number of results based on the allowed limit (25, 50, 100). Defaults to 25.
 
 ## Searching for a book
+
 ```python
 async def search():
     q = 'japan history'
@@ -40,12 +47,11 @@ async def search():
         print('md5 = ' + result[item]['md5'])
 ```
 
-The returned data looks like this:
+The returned data looks like this: (The dict key is the Libgen id of the book)
 
 ```python
 {
     '881061':{
-        'id': '881061',
         'title': 'The Japanese Experience: A Short History of Japan (History of Civilisation)',
         'volumeinfo': '',
         'series': '',
@@ -130,7 +136,9 @@ The returned data looks like this:
 Note that the above information except for mirrors is fecthed as is from Libgen and it is up to the uploader of the books to include the metadata of the books.
 
 ## Downloading a book
+
 Downloading is only supported for the top **3** mirrors in the returned result ('main', 'libgen.lc', 'z-library'). Pass one of the 3 links to the download method of the Libgen object. Optionaly a destination Path can be passed with the url using **dest_folder** argument. The output of the download method is a Path to the downloaded file.
+
 ```python
 async def download():
     q = 'japan history'
