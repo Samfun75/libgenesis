@@ -176,13 +176,9 @@ class Libgen:
                          filters: dict) -> dict:
 
         ids = 'ids=' + ','.join(ids_list)
-        if not return_fields or 'mirrors' in return_fields:
-            mirrors = True
-        else:
-            mirrors = False
         fields = 'fields=' + \
             ('id,' if return_fields and 'id' not in return_fields else '')
-        if mirrors and '*' not in return_fields:
+        if 'mirrors' in return_fields:
             fields += ('md5,' if return_fields and 'md5' not in return_fields else '') + \
                 ('sha1,' if return_fields and 'sha1' not in return_fields else '') + \
                 ('filesize,' if return_fields and 'filesize' not in return_fields else '') + \
@@ -206,13 +202,13 @@ class Libgen:
         return await self.__format_json(raw_data=raw_data,
                                         ids_list=ids_list,
                                         filters=filters,
-                                        mirrors=mirrors)
+                                        return_fields=return_fields)
 
     async def __format_json(self,
                             raw_data: list,
                             ids_list: list,
                             filters: dict,
-                            mirrors: bool) -> dict:
+                            return_fields: list) -> dict:
 
         data = {}
         if raw_data:
@@ -230,14 +226,28 @@ class Libgen:
                     if 'coverurl' in data[res_id].keys():
                         data[res_id][
                             'coverurl'] = f'{self.__libgen_url}/covers/{data[res_id]["coverurl"]}'
-                    if mirrors:
+                    if 'mirrors' in return_fields:
                         md5 = data[res_id]['md5']
+                        if 'md5' not in return_fields:
+                            data[res_id].pop('md5')
                         sha1 = data[res_id]['sha1']
+                        if 'sha1' not in return_fields:
+                            data[res_id].pop('sha1')
                         size = data[res_id]['filesize']
+                        if 'filesize' not in return_fields:
+                            data[res_id].pop('filesize')
                         edonkey = data[res_id]['edonkey']
+                        if 'edonkey' not in return_fields:
+                            data[res_id].pop('edonkey')
                         aich = data[res_id]['aich']
+                        if 'aich' not in return_fields:
+                            data[res_id].pop('aich')
                         tth = data[res_id]['tth']
+                        if 'tth' not in return_fields:
+                            data[res_id].pop('tth')
                         extension = data[res_id]['extension']
+                        if 'extension' not in return_fields:
+                            data[res_id].pop('extension')
                         tor_number = str(res_id)[
                             :-3] + '000' if int(res_id) >= 1000 else '000'
                         data[res_id]['mirrors'] = {}
@@ -271,6 +281,7 @@ class Libgen:
 
                         data[res_id]['mirrors'][
                             'dc++'] = f'magnet:?xt=urn:tree:tiger:{tth}&xl={size}&dn={md5}.{extension}'
+
                     if 'torrent' in data[res_id].keys():
                         data[res_id].pop('torrent')
                     if 'locator' in data[res_id].keys():
