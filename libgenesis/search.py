@@ -220,7 +220,7 @@ class Libgen:
                     if 'coverurl' in data[res_id].keys():
                         data[res_id][
                             'coverurl'] = f'{self.__libgen_url}/covers/{data[res_id]["coverurl"]}'
-                    if 'mirrors' in return_fields:
+                    if not return_fields or 'mirrors' in return_fields:
                         md5 = data[res_id]['md5']
                         if 'md5' not in return_fields:
                             data[res_id].pop('md5')
