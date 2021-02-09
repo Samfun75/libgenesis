@@ -19,13 +19,13 @@ with open('README.md', 'r', encoding='utf-8') as rm_file:
     readme = rm_file.read()
 
 setup(name='libgenesis',
-      version='0.1.2',
+      version='0.1.3',
       packages=find_packages(exclude=('tests')),
       zip_safe=False,
       url='https://github.com/Samfun75/libgenesis',
       long_description_content_type='text/markdown',
       description='Asynchronous python lib for Libgen.rs',
-      download_url='https://github.com/Samfun75/libgenesis/archive/v0.1.2.tar.gz',
+      download_url='https://github.com/Samfun75/libgenesis/archive/v0.1.3.tar.gz',
       long_description=readme,
       author='Samson Misganaw',
       author_email='samfunn75@gmail.com',
