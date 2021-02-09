@@ -178,14 +178,8 @@ class Libgen:
         ids = 'ids=' + ','.join(ids_list)
         fields = 'fields=' + \
             ('id,' if return_fields and 'id' not in return_fields else '')
-        if 'mirrors' in return_fields:
-            fields += ('md5,' if return_fields and 'md5' not in return_fields else '') + \
-                ('sha1,' if return_fields and 'sha1' not in return_fields else '') + \
-                ('filesize,' if return_fields and 'filesize' not in return_fields else '') + \
-                ('edonkey,' if return_fields and 'edonkey' not in return_fields else '') + \
-                ('aich,' if return_fields and 'aich' not in return_fields else '') + \
-                ('tth,' if return_fields and 'tth' not in return_fields else '') + \
-                ('extension,' if return_fields and 'extension' not in return_fields else '')
+        if return_fields and 'mirrors' in return_fields:
+            fields += f'md5,sha1,filesize,edonkey,aich,tth,extension{"," if len(return_fields) > 1 else ""}'
 
         fields += (','.join([fld for fld in return_fields if fld !=
                              'mirrors']) if return_fields else '*')
@@ -196,7 +190,7 @@ class Libgen:
         logging.info(
             f'Requesting JSON data from resulted in code: {r.status_code}')
         if r.status_code != 200:
-            await Util().raise_error(r.status_code, str(r.reason) + str(bsoup(r.text, 'lxml').get_text()))
+            await Util().raise_error(r.status_code, str(r.reason) + ' - ' + str(bsoup(r.text, 'lxml').get_text()))
 
         raw_data = r.json()
         return await self.__format_json(raw_data=raw_data,
