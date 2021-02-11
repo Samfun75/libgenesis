@@ -2,6 +2,8 @@
 
 Asynchronous python library for Libgen.rs to search and download books.
 
+[![PyPI version](https://badge.fury.io/py/libgenesis.svg)](https://pypi.org/project/libgenesis)
+
 ## Installing libgenesis
 
 using the command line
