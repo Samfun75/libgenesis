@@ -53,6 +53,8 @@ class Libgen:
         self.__search_url = f'{self.__libgen_url}/search.php?'
 
         self.__ses = requests.Session()
+        self.__ses.cookies.set('lg_topic', 'libgen',
+                               domain='libgen.rs', expires=None)
         self.__ses.headers.update({
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
             'AppleWebKit/537.36 (KHTML, like Gecko) '
