@@ -1,3 +1,4 @@
+import re
 import logging
 import requests
 from .utils import Util
@@ -219,9 +220,13 @@ class Libgen:
                             removed.append(res_id)
                             continue
 
-                    if 'coverurl' in data[res_id].keys():
+                    cover_reg = re.compile(r'^\d+\\\/[a-z-0-9]+\..{1,4}$', re.IGNORECASE)
+                    if 'coverurl' in data[res_id].keys() and re.match(cover_reg, data[res_id]["coverurl"]):
                         data[res_id][
                             'coverurl'] = f'{self.__libgen_url}/covers/{data[res_id]["coverurl"]}'
+                    elif 'coverurl' in data[res_id].keys():
+                        data[res_id][
+                            'coverurl'] = 'https://cdn2.iconfinder.com/data/icons/leto-blue-online-education/64/__book_mouth_education_online-512.png'
                     if not return_fields or 'mirrors' in return_fields:
                         md5 = data[res_id]['md5']
                         if 'md5' not in return_fields:
