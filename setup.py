@@ -8,6 +8,7 @@ from codecs import open
 
 from setuptools import find_packages, setup
 
+from libgenesis import __version__
 # allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
@@ -19,13 +20,13 @@ with open('README.md', 'r', encoding='utf-8') as rm_file:
     readme = rm_file.read()
 
 setup(name='libgenesis',
-      version='0.1.4',
+      version=__version__,
       packages=find_packages(exclude=('tests')),
       zip_safe=False,
       url='https://github.com/Samfun75/libgenesis',
       long_description_content_type='text/markdown',
       description='Asynchronous python lib for Libgen.rs',
-      download_url='https://github.com/Samfun75/libgenesis/archive/v0.1.4.tar.gz',
+      download_url=f'https://github.com/Samfun75/libgenesis/archive/v{__version__}.tar.gz',
       long_description=readme,
       author='Samson Misganaw',
       author_email='samfunn75@gmail.com',

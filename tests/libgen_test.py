@@ -1,4 +1,3 @@
-from os import stat
 from libgenesis import Libgen
 from pathlib import Path
 import pytest
