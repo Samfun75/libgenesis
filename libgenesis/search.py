@@ -220,34 +220,37 @@ class Libgen:
                             removed.append(res_id)
                             continue
 
-                    cover_reg = re.compile(r'^\d+\\\/[a-z-0-9]+\..{1,4}$', re.IGNORECASE)
-                    if 'coverurl' in data[res_id].keys() and re.match(cover_reg, data[res_id]["coverurl"]):
-                        data[res_id][
-                            'coverurl'] = f'{self.__libgen_url}/covers/{data[res_id]["coverurl"]}'
-                    elif 'coverurl' in data[res_id].keys():
-                        data[res_id][
-                            'coverurl'] = 'https://cdn2.iconfinder.com/data/icons/leto-blue-online-education/64/__book_mouth_education_online-512.png'
+                    cover_reg = re.compile(r'^\d+\\?\/[a-z-0-9]+\..{1,4}$', re.IGNORECASE)
+                    if 'coverurl' in data[res_id].keys():
+                        if re.match(cover_reg, data[res_id]["coverurl"]):
+                            data[res_id][
+                                'coverurl'] = f'{self.__libgen_url}/covers/{data[res_id]["coverurl"]}'
+                        else:
+                            print(data[res_id]["coverurl"])
+                            print(re.match(cover_reg, data[res_id]["coverurl"]))
+                            data[res_id][
+                                'coverurl'] = 'https://cdn2.iconfinder.com/data/icons/leto-blue-online-education/64/__book_mouth_education_online-512.png'
                     if not return_fields or 'mirrors' in return_fields:
                         md5 = data[res_id]['md5']
-                        if 'md5' not in return_fields:
+                        if return_fields and 'md5' not in return_fields:
                             data[res_id].pop('md5')
                         sha1 = data[res_id]['sha1']
-                        if 'sha1' not in return_fields:
+                        if return_fields and 'sha1' not in return_fields:
                             data[res_id].pop('sha1')
                         size = data[res_id]['filesize']
-                        if 'filesize' not in return_fields:
+                        if return_fields and 'filesize' not in return_fields:
                             data[res_id].pop('filesize')
                         edonkey = data[res_id]['edonkey']
-                        if 'edonkey' not in return_fields:
+                        if return_fields and 'edonkey' not in return_fields:
                             data[res_id].pop('edonkey')
                         aich = data[res_id]['aich']
-                        if 'aich' not in return_fields:
+                        if return_fields and 'aich' not in return_fields:
                             data[res_id].pop('aich')
                         tth = data[res_id]['tth']
-                        if 'tth' not in return_fields:
+                        if return_fields and 'tth' not in return_fields:
                             data[res_id].pop('tth')
                         extension = data[res_id]['extension']
-                        if 'extension' not in return_fields:
+                        if return_fields and 'extension' not in return_fields:
                             data[res_id].pop('extension')
                         tor_number = str(res_id)[
                             :-3] + '000' if int(res_id) >= 1000 else '000'
