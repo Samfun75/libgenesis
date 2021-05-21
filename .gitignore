@@ -4,4 +4,3 @@
 /*.egg-info
 /.pytest_cache
 **/download_test
-test.py

@@ -5,7 +5,9 @@ from .utils import Util
 from pathlib import Path
 from .download import LibgenDownload
 from bs4 import BeautifulSoup as bsoup
+from typing import Awaitable, Callable, Optional
 
+logg = logging.getLogger(__name__)
 
 class Libgen:
     def __init__(self,
@@ -158,7 +160,7 @@ class Libgen:
 
         r = self.__ses.get(url=url,
                            allow_redirects=True)
-        logging.info(
+        logg.debug(
             f'Requesting IDs page resulted in code: {r.status_code}')
         if r.status_code != 200:
             await Util().raise_error(r.status_code, str(r.reason) + ' - ' + str(bsoup(r.text, 'lxml').get_text()))
@@ -190,7 +192,7 @@ class Libgen:
         url = '&'.join([self.__json_url, ids, fields])
         r = self.__ses.get(url,
                            allow_redirects=True)
-        logging.info(
+        logg.debug(
             f'Requesting JSON data from resulted in code: {r.status_code}')
         if r.status_code != 200:
             await Util().raise_error(r.status_code, str(r.reason) + ' - ' + str(bsoup(r.text, 'lxml').get_text()))
@@ -226,8 +228,6 @@ class Libgen:
                             data[res_id][
                                 'coverurl'] = f'{self.__libgen_url}/covers/{data[res_id]["coverurl"]}'
                         else:
-                            print(data[res_id]["coverurl"])
-                            print(re.match(cover_reg, data[res_id]["coverurl"]))
                             data[res_id][
                                 'coverurl'] = 'https://cdn2.iconfinder.com/data/icons/leto-blue-online-education/64/__book_mouth_education_online-512.png'
                     if not return_fields or 'mirrors' in return_fields:
@@ -294,18 +294,23 @@ class Libgen:
                 if removed:
                     for ids in removed:
                         data.pop(ids)
-        logging.info(f'Finished processing {len(data)} results.')
+        logg.info(f'Finished processing {len(data)} results.')
         return data
 
     @staticmethod
     async def download(url: str,
-                       dest_folder: Path = None) -> Path:
+                       dest_folder: Path = None,
+                       progress: Optional[Callable[..., Awaitable[None]]] = None,
+                       progress_args: list = []) -> Path:
         """Download the book from support mirro: 'library.lol', 'libgen.lc', 'libgen.gs', 'b-ok.cc'
 
 
         Args:
             url (str): The download like retrived from search method
             dest_folder (Path, optional): A path where the book should be download. Defaults to the current working directory.
+            progress (Optional[Callable[..., Awaitable[None]]]): An awaitable function for progress updates that takes at least 2 arguments -
+                    current: int and total int or str and other arguments passed through progress args.
+            progress_args (list): Arguments to be passed to the progress update function along with progress update
 
 
         Returns:
@@ -313,4 +318,6 @@ class Libgen:
 
         """
         return await LibgenDownload().download(url,
-                                               dest_folder)
+                                               dest_folder,
+                                               progress,
+                                               progress_args)
