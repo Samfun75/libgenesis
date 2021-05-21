@@ -5,6 +5,8 @@ Asynchronous python library for Libgen.rs to search and download books.
 [![PyPI version](https://badge.fury.io/py/libgenesis.svg)](https://pypi.org/project/libgenesis)
 [![Build Python Package](https://github.com/Samfun75/libgenesis/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Samfun75/libgenesis/actions/workflows/python-publish.yml)
 
+### [Bookdlbot](https://github.com/Samfun75/BookdlBot) Async telegram bot utilizing this library
+
 ## Installing libgenesis
 
 using the command line
@@ -156,6 +158,6 @@ async def download():
                                       ])
         download_location.append(file_path)
 
-    async def progress(current, total, title):
-        print('Downloading ', current, ' of ', total, ' ', title)
+async def progress(current, total, title):
+    print('Downloading ', current, ' of ', total, ' ', title)
 ```
