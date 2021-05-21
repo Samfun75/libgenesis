@@ -3,6 +3,7 @@
 Asynchronous python library for Libgen.rs to search and download books.
 
 [![PyPI version](https://badge.fury.io/py/libgenesis.svg)](https://pypi.org/project/libgenesis)
+[![Build Python Package](https://github.com/Samfun75/libgenesis/actions/workflows/python-publish.yml/badge.svg)](https://github.com/Samfun75/libgenesis/actions/workflows/python-publish.yml)
 
 ## Installing libgenesis
 
@@ -145,9 +146,16 @@ async def download():
     q = 'japan history'
     result = await lg.search(q)
     download_location = []
+    path = Path('Downloads')
     for item in result:
-        file_path = await lg.download(result[item]['mirrors']['main'])
-        # path = Path('Downloads')
-        # file_path = await lg.download(result[item]['mirrors']['main'], dest_folder=path)
+        file_path = await lg.download(result[item]['mirrors']['main'],
+                                      dest_folder=path,
+                                      progress=progress,
+                                      progress_args=[
+                                          result[item]['title']
+                                      ])
         download_location.append(file_path)
+
+    async def progress(current, total, title):
+        print('Downloading ', current, ' of ', total, ' ', title)
 ```
