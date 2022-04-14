@@ -40,7 +40,7 @@ class LibgenDownload:
             Path.mkdir(dest_folder)
 
         direct_links = await self.get_directlink(url)
-        for link in reversed(direct_links):
+        for link in direct_links:
             file = await self.__download(link,
                                          dest_folder,
                                          progress,
@@ -105,9 +105,9 @@ class LibgenDownload:
         direct_links = []
         if domain == 'library.lol':
             div = soup.find('div', attrs={'id': 'download'})
-            direct_links.append(div.h2.a['href'])
             for li in div.ul.findAll('li'):
                 direct_links.append(li.a['href'])
+            direct_links.append(div.h2.a['href'])
         elif domain == 'libgen.lc' or domain == 'libgen.gs':
             table = soup.find('table', attrs={'id': 'main'})
             direct_links.append(table.tr.findAll('td')[1].a['href'])
